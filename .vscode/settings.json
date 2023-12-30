@@ -57,5 +57,6 @@
     "json",
     "jsonc",
     "yaml"
-  ]
+  ],
+  "nuxt.isNuxtApp": false
 }
