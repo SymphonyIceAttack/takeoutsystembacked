@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  ParseIntPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ShopProductListService } from './shop-product-list.service';
 
 @Controller('shop-product-list')
@@ -15,10 +22,10 @@ export class ShopProductListController {
   @Post('ProdList')
   async ProdList(
     @Body() Filter: { MerChantId: string | null; AreaId: string | null },
+    @Query('pageNumber', ParseIntPipe) pageNumber: number,
   ) {
-    console.log(Filter);
-
     return this.shopProductListService.ProdList(
+      pageNumber,
       Filter.AreaId,
       Filter.MerChantId,
     );

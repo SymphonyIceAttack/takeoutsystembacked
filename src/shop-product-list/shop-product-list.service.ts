@@ -8,7 +8,14 @@ export class ShopProductListService {
   async MerchantArray() {
     return await this.PrismaService.shop.findMany();
   }
-  async ProdList(AreaId: string | null, mer_id: string | null) {
+  async ProdList(
+    pageNumber: number,
+    AreaId: string | null,
+    mer_id: string | null,
+  ) {
+    const pageSize = 10; // 每页记录数
+    const skip = (pageNumber - 1) * pageSize; // 计算要跳过的记录数量
+    const take = pageSize; // 返回的记录数量
     const whereCondition: any = {};
 
     if (AreaId !== null) {
@@ -19,8 +26,17 @@ export class ShopProductListService {
       whereCondition.mer_id = mer_id;
     }
 
-    return this.PrismaService.productsShelves.findMany({
+    const totalCount = await this.PrismaService.productsShelves.count({
       where: whereCondition,
     });
+
+    return {
+      total: totalCount,
+      list: await this.PrismaService.productsShelves.findMany({
+        where: whereCondition,
+        skip: skip, // 跳过的记录数量
+        take: take, // 返回的记录数量
+      }),
+    };
   }
 }
