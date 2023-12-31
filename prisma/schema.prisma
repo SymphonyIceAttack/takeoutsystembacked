@@ -10,11 +10,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
 model User {
-  id    String   @default(uuid())   @id
+  id       String @id @default(uuid())
   account  String @unique
   password String
   identity String
+}
+
+model ProductsShelves {
+  id               String @id @unique
+  goods_title      String
+  area_id          String
+  mer_id           String
+  store_title      String
+  AreaTitle        String
+  goods_price_sale Int
+  sold_total_all   Int
+  shop             Shop   @relation(fields: [mer_id], references: [id])
+}
+
+model Shop {
+  id          String            @id @unique
+  store_title String
+  area_id     String
+  area_title  String
+  ProdList    ProductsShelves[]
 }
