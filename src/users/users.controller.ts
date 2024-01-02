@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { PayLoadType } from 'src/auth/payload.type';
 import { PrismaService } from 'src/prisma.service';
 import { userIdentityEnum } from './userIdentity.enum';
 import { UsersService } from './users.service';
@@ -32,5 +41,13 @@ export class UsersController {
     },
   ) {
     return this.usersService.Login(UserMessage.account, UserMessage.password);
+  }
+  @UseGuards(AuthGuard)
+  @Get('checkLogin')
+  async checkLogin(@Request() req: { user: PayLoadType }) {
+    return {
+      statusCode: 201,
+      user: req.user,
+    };
   }
 }
