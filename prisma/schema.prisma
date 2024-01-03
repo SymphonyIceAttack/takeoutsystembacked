@@ -11,10 +11,11 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  account  String @unique
+  id       String  @id @default(uuid())
+  account  String  @unique
   password String
   identity String
+  Order    Order[]
 }
 
 model ProductsShelves {
@@ -27,6 +28,7 @@ model ProductsShelves {
   goods_price_sale Int
   sold_total_all   Int
   shop             Shop   @relation(fields: [mer_id], references: [id])
+  Dish             Dish[]
 }
 
 model Shop {
@@ -35,4 +37,27 @@ model Shop {
   area_id     String
   area_title  String
   ProdList    ProductsShelves[]
+  Order       Order[]
+}
+
+model Dish {
+  id       String @id @default(uuid())
+  order_id String
+
+  productId String
+  order     Order           @relation(fields: [order_id], references: [id])
+  product   ProductsShelves @relation(fields: [productId], references: [id])
+}
+
+model Order {
+  id      String @id @unique @default(uuid())
+  mer_id  String
+  user_id String
+
+  create_time DateTime @default(now())
+
+  dishes Dish[]
+
+  shop Shop @relation(fields: [mer_id], references: [id])
+  user User @relation(fields: [user_id], references: [id])
 }
