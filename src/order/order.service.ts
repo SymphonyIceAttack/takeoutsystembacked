@@ -20,19 +20,22 @@ export class OrderService {
     const newOrder = await this.PrismaService.order.create({
       data: { mer_id: mer_id, user_id: user_id },
     });
+    const DishPromiseArray: Promise<any>[] = [];
 
-    const res = await Promise.all(
-      Dishes.map(async (DishObj) => {
-        return new Array(DishObj.number).map(async (DishItem) => {
-          return this.PrismaService.dish.create({
+    Dishes.forEach((DishObj) => {
+      new Array(DishObj.number).fill(0).forEach(() => {
+        DishPromiseArray.push(
+          this.PrismaService.dish.create({
             data: {
               productId: DishObj.product_id,
               order_id: newOrder.id,
             },
-          });
-        });
-      }),
-    );
+          }),
+        );
+      });
+    });
+    const res = await Promise.all(DishPromiseArray);
+
     return res;
   }
 }
