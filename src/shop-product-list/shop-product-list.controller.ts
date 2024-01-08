@@ -21,7 +21,8 @@ export class ShopProductListController {
 
   @Post('ProdList')
   async ProdList(
-    @Body() Filter: { MerChantId: string | null; AreaId: string | null },
+    @Body()
+    Filter: { MerChantId?: string; AreaId?: string },
     @Query('pageNumber', ParseIntPipe) pageNumber: number,
   ) {
     return this.shopProductListService.ProdList(
