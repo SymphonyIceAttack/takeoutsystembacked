@@ -58,6 +58,10 @@ model Order {
 
   dishes Dish[]
 
+  status String
+  number Int
+  totalPrice Int
+
   shop Shop @relation(fields: [mer_id], references: [id])
   user User @relation(fields: [user_id], references: [id])
 }
