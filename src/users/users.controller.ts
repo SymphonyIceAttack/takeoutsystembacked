@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { PayLoadType } from 'src/auth/payload.type';
-import { PrismaService } from 'src/prisma.service';
 import { userIdentityEnum } from './userIdentity.enum';
 import { UsersService } from './users.service';
 

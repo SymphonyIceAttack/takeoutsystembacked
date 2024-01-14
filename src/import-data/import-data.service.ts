@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import axios from 'axios';
+
 import { PrismaService } from 'src/prisma.service';
+import { userIdentityEnum } from 'src/users/userIdentity.enum';
 
 @Injectable()
 export class ImportDataService {
@@ -10,7 +11,7 @@ export class ImportDataService {
     return fetch('http://127.0.0.1:3001/data-analysis/exportShopList')
       .then((res) => res.json())
       .then(
-        (
+        async (
           res: {
             mer_id: string;
             store_title: string;
@@ -18,16 +19,26 @@ export class ImportDataService {
             area_id: string;
           }[],
         ) => {
-          res.map(async (shopItem) => {
-            await this.PrismaService.shop.create({
-              data: {
-                area_id: shopItem.area_id,
-                id: shopItem.mer_id,
-                store_title: shopItem.store_title,
-                area_title: shopItem.AreaTitle,
-              },
-            });
-          });
+          const UserList = await Promise.all(
+            res.map((item) =>
+              this.PrismaService.user.create({
+                data: {
+                  account: item.mer_id,
+                  password: item.mer_id,
+                  identity: userIdentityEnum.商家,
+                  Shop: {
+                    create: {
+                      id: item.mer_id,
+                      store_title: item.store_title,
+                      area_id: item.area_id,
+                      area_title: item.AreaTitle,
+                    },
+                  },
+                },
+              }),
+            ),
+          );
+          return UserList;
         },
       );
   }

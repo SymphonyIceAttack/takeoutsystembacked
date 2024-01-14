@@ -16,6 +16,7 @@ model User {
   password String
   identity String
   Order    Order[]
+  Shop     Shop?
 }
 
 model ProductsShelves {
@@ -33,11 +34,13 @@ model ProductsShelves {
 
 model Shop {
   id          String            @id @unique
+  userId      String            @unique
   store_title String
   area_id     String
   area_title  String
   ProdList    ProductsShelves[]
   Order       Order[]
+  user        User              @relation(fields: [userId], references: [id])
 }
 
 model Dish {
@@ -58,8 +61,8 @@ model Order {
 
   dishes Dish[]
 
-  status String
-  number Int
+  status     String
+  number     Int
   totalPrice Int
 
   shop Shop @relation(fields: [mer_id], references: [id])

@@ -72,6 +72,7 @@ export class OrderService {
     const totalCount = await this.PrismaService.order.count({
       where: {
         user_id: userId,
+        status: status === OrderStatus.all ? undefined : status,
       },
     });
 
@@ -80,6 +81,7 @@ export class OrderService {
       list: await this.PrismaService.order.findMany({
         where: {
           status: status === OrderStatus.all ? undefined : status,
+          user_id: userId,
         },
         include: {
           shop: true,
