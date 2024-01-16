@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { PayLoadType } from './payload.type';
+import { userIdentityEnum } from 'src/users/userIdentity.enum';
 @Injectable()
 export class AuthService {
   constructor(
@@ -17,7 +18,11 @@ export class AuthService {
     if (user?.password !== pass) {
       throw new UnauthorizedException();
     }
-    const payload: PayLoadType = { userid: user.id, username: user.account };
+    const payload: PayLoadType = {
+      userid: user.id,
+      username: user.account,
+      identity: user.identity as userIdentityEnum,
+    };
     return {
       statusCode: 201,
       access_token: await this.jwtService.signAsync(payload),
