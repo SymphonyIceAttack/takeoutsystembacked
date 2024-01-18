@@ -20,7 +20,7 @@ model User {
 }
 
 model ProductsShelves {
-  id               String @id @unique
+  id               String  @id @unique @default(uuid())
   goods_title      String
   area_id          String
   mer_id           String
@@ -28,7 +28,9 @@ model ProductsShelves {
   AreaTitle        String
   goods_price_sale Int
   sold_total_all   Int
-  shop             Shop   @relation(fields: [mer_id], references: [id])
+  allowShopControl Boolean
+  isShelvesShow    Boolean
+  shop             Shop    @relation(fields: [mer_id], references: [id])
   Dish             Dish[]
 }
 

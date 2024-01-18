@@ -71,6 +71,8 @@ export class ImportDataService {
                   AreaTitle: item.AreaTitle,
                   sold_total_all: item.sold_total_all,
                   store_title: item.store_title,
+                  allowShopControl: true,
+                  isShelvesShow: true,
                 },
               }),
             ),

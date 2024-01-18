@@ -16,11 +16,9 @@ export class ShopService {
   }
 
   async getShopDetail(MerId: string) {
-    return this.PrismaService.shop
-      .findUnique({
-        where: { id: MerId },
-      })
-      .catch(() => undefined);
+    return this.PrismaService.shop.findUnique({
+      where: { id: MerId },
+    });
   }
 
   async MerOrderList(pageNumber: number, merId?: string, status?: OrderStatus) {
@@ -96,5 +94,25 @@ export class ShopService {
         take: take, // 返回的记录数量
       }),
     };
+  }
+
+  async createProduct(
+    MerId: string,
+    ProdItem: { goods_price_sale: number; goods_title: string },
+  ) {
+    const shopItem = await this.getShopDetail(MerId);
+    return this.PrismaService.productsShelves.create({
+      data: {
+        mer_id: MerId,
+        store_title: shopItem.store_title,
+        area_id: shopItem.area_id,
+        AreaTitle: shopItem.area_title,
+        goods_price_sale: ProdItem.goods_price_sale,
+        goods_title: ProdItem.goods_title,
+        sold_total_all: 0,
+        allowShopControl: false,
+        isShelvesShow: false,
+      },
+    });
   }
 }

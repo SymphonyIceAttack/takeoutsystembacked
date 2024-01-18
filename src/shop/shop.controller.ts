@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
@@ -27,9 +28,11 @@ export class ShopController {
     return this.shopService.getMerId(req.user.userid);
   }
 
-  @Get('getShopDetail/:MerId')
-  async getShopDetail(@Param('MerId') MerId: string) {
-    return this.shopService.getShopDetail(MerId);
+  @Get('getShopDetail')
+  async getShopDetail(@Request() req: { user: PayLoadType }) {
+    return this.shopService
+      .getMerId(req.user.userid)
+      .then((MerId) => this.shopService.getShopDetail(MerId));
   }
 
   @Post('MerOrderList')
@@ -59,5 +62,14 @@ export class ShopController {
   ) {
     const mer_id = await this.shopService.getMerId(req.user.userid);
     return this.shopService.MerProductList(pageNumber, mer_id);
+  }
+  @Post('createProduct')
+  async createProduct(
+    @Request() req: { user: PayLoadType },
+    @Body() body: { goods_price_sale: number; goods_title: string },
+  ) {
+    return this.shopService
+      .getMerId(req.user.userid)
+      .then((MerId) => this.shopService.createProduct(MerId, body));
   }
 }

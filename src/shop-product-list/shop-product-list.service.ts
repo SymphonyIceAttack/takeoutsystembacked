@@ -17,6 +17,7 @@ export class ShopProductListService {
       where: {
         area_id: AreaId,
         mer_id: mer_id,
+        isShelvesShow: true,
       },
     });
 
@@ -26,6 +27,7 @@ export class ShopProductListService {
         where: {
           area_id: AreaId,
           mer_id: mer_id,
+          isShelvesShow: true,
         },
         skip: skip, // 跳过的记录数量
         take: take, // 返回的记录数量
