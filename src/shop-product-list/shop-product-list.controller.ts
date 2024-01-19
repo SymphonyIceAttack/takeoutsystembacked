@@ -22,13 +22,20 @@ export class ShopProductListController {
   @Post('ProdList')
   async ProdList(
     @Body()
-    Filter: { MerChantId?: string; AreaId?: string },
+    Filter: {
+      MerChantId?: string;
+      AreaId?: string;
+      allowControl?: boolean;
+      isShelvesShow?: boolean;
+    },
     @Query('pageNumber', ParseIntPipe) pageNumber: number,
   ) {
     return this.shopProductListService.ProdList(
       pageNumber,
       Filter.AreaId,
       Filter.MerChantId,
+      Filter.allowControl,
+      Filter.isShelvesShow,
     );
   }
 }

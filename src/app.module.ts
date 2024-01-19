@@ -8,6 +8,7 @@ import { ShopProductListModule } from './shop-product-list/shop-product-list.mod
 import { AuthModule } from './auth/auth.module';
 import { OrderModule } from './order/order.module';
 import { ShopModule } from './shop/shop.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ShopModule } from './shop/shop.module';
     AuthModule,
     OrderModule,
     ShopModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

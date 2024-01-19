@@ -8,7 +8,13 @@ export class ShopProductListService {
   async MerchantArray() {
     return await this.PrismaService.shop.findMany();
   }
-  async ProdList(pageNumber: number, AreaId?: string, mer_id?: string) {
+  async ProdList(
+    pageNumber: number,
+    AreaId?: string,
+    mer_id?: string,
+    allowControl?: boolean,
+    isShelvesShow?: boolean,
+  ) {
     const pageSize = 10; // 每页记录数
     const skip = (pageNumber - 1) * pageSize; // 计算要跳过的记录数量
     const take = pageSize; // 返回的记录数量
@@ -17,7 +23,8 @@ export class ShopProductListService {
       where: {
         area_id: AreaId,
         mer_id: mer_id,
-        isShelvesShow: true,
+        allowShopControl: allowControl,
+        isShelvesShow: isShelvesShow,
       },
     });
 
@@ -27,7 +34,8 @@ export class ShopProductListService {
         where: {
           area_id: AreaId,
           mer_id: mer_id,
-          isShelvesShow: true,
+          allowShopControl: allowControl,
+          isShelvesShow: isShelvesShow,
         },
         skip: skip, // 跳过的记录数量
         take: take, // 返回的记录数量
