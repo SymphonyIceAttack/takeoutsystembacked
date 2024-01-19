@@ -58,10 +58,11 @@ export class ShopController {
   @Post('MerProductList')
   async MerProductList(
     @Query('pageNumber', ParseIntPipe) pageNumber: number,
+    @Query('isReview', ParseIntPipe) isReview: number,
     @Request() req: { user: PayLoadType },
   ) {
     const mer_id = await this.shopService.getMerId(req.user.userid);
-    return this.shopService.MerProductList(pageNumber, mer_id);
+    return this.shopService.MerProductList(pageNumber, isReview === 1, mer_id);
   }
   @Post('createProduct')
   async createProduct(

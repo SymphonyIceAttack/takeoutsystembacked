@@ -74,7 +74,7 @@ export class ShopService {
     });
   }
 
-  async MerProductList(pageNumber: number, merId?: string) {
+  async MerProductList(pageNumber: number, isReview: boolean, merId?: string) {
     const pageSize = 10; // 每页记录数
     const skip = (pageNumber - 1) * pageSize; // 计算要跳过的记录数量
     const take = pageSize; // 返回的记录数量
@@ -82,6 +82,7 @@ export class ShopService {
     const totalCount = await this.PrismaService.productsShelves.count({
       where: {
         mer_id: merId,
+        allowShopControl: isReview,
       },
     });
 
@@ -90,6 +91,7 @@ export class ShopService {
       list: await this.PrismaService.productsShelves.findMany({
         where: {
           mer_id: merId,
+          allowShopControl: isReview,
         },
         include: {},
         skip: skip, // 跳过的记录数量
