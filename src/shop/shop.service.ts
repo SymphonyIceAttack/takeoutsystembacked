@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { OrderStatus } from 'src/order/Status.type';
 import { PrismaService } from 'src/prisma.service';
 
@@ -12,7 +12,9 @@ export class ShopService {
         include: { Shop: true },
       })
       .then((res) => res.Shop.id)
-      .catch(() => undefined);
+      .catch(() => {
+        throw new UnauthorizedException();
+      });
   }
 
   async getShopDetail(MerId: string) {
@@ -112,6 +114,32 @@ export class ShopService {
         sold_total_all: 0,
         allowShopControl: false,
         isShelvesShow: false,
+      },
+    });
+  }
+
+  async changeProductStatus(
+    MerId: string,
+    productId: string,
+    isShelvesShow: boolean,
+  ) {
+    const OriginProduct = await this.PrismaService.productsShelves.findUnique({
+      where: { id: productId },
+      include: {
+        shop: true,
+      },
+    });
+
+    if (
+      OriginProduct.shop.id !== MerId ||
+      OriginProduct.allowShopControl === false
+    ) {
+      throw new UnauthorizedException();
+    }
+    return this.PrismaService.productsShelves.update({
+      where: { id: productId },
+      data: {
+        isShelvesShow: isShelvesShow,
       },
     });
   }

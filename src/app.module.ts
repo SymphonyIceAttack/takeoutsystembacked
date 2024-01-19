@@ -10,7 +10,14 @@ import { OrderModule } from './order/order.module';
 import { ShopModule } from './shop/shop.module';
 
 @Module({
-  imports: [UsersModule, ImportDataModule, ShopProductListModule, AuthModule, OrderModule, ShopModule],
+  imports: [
+    UsersModule,
+    ImportDataModule,
+    ShopProductListModule,
+    AuthModule,
+    OrderModule,
+    ShopModule,
+  ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
   exports: [PrismaService],

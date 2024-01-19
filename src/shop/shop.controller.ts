@@ -32,7 +32,7 @@ export class ShopController {
   async getShopDetail(@Request() req: { user: PayLoadType }) {
     return this.shopService
       .getMerId(req.user.userid)
-      .then((MerId) => this.shopService.getShopDetail(MerId));
+      .then((MerId) => MerId && this.shopService.getShopDetail(MerId));
   }
 
   @Post('MerOrderList')
@@ -70,6 +70,25 @@ export class ShopController {
   ) {
     return this.shopService
       .getMerId(req.user.userid)
-      .then((MerId) => this.shopService.createProduct(MerId, body));
+      .then((MerId) => MerId && this.shopService.createProduct(MerId, body));
+  }
+
+  @Post('changeProductStatus')
+  async changeProductStatus(
+    @Request() req: { user: PayLoadType },
+    @Query('isShelvesShow', ParseIntPipe) isShelvesShow: number,
+    @Query('productId') productId: string,
+  ) {
+    return this.shopService
+      .getMerId(req.user.userid)
+      .then(
+        (MerId) =>
+          MerId &&
+          this.shopService.changeProductStatus(
+            MerId,
+            productId,
+            isShelvesShow === 1,
+          ),
+      );
   }
 }
