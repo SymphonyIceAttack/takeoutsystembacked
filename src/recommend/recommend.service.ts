@@ -1,6 +1,7 @@
 import { Injectable, Post } from '@nestjs/common';
 import { OrderStatus } from 'src/order/Status.type';
 import { PrismaService } from 'src/prisma.service';
+import { cosineSimilarity, findSimilarUsers } from './SimilarityFunction';
 
 @Injectable()
 export class RecommendService {
@@ -113,87 +114,85 @@ export class RecommendService {
       });
     });
 
-    function cosineSimilarity(
-      user1: { [productId: string]: number },
-      user2: { [productId: string]: number },
-    ): number {
-      let dotProduct = 0;
-      let normUser1 = 0;
-      let normUser2 = 0;
-
-      for (const productId in user1) {
-        if (user2.hasOwnProperty(productId)) {
-          dotProduct += user1[productId] * user2[productId];
-        }
-        normUser1 += user1[productId] ** 2;
-      }
-
-      for (const productId in user2) {
-        normUser2 += user2[productId] ** 2;
-      }
-
-      const similarity =
-        dotProduct / (Math.sqrt(normUser1) * Math.sqrt(normUser2));
-      return isNaN(similarity) ? 0 : similarity; // Handle division by zero
-    }
-
-    function findSimilarUsers(
-      targetUserId: string,
-      data: { [userId: string]: { [productId: string]: number } },
-    ): string[] {
-      const targetUser = data[targetUserId];
-      const similarUsers: string[] = [];
-
-      for (const userId in data) {
-        if (userId !== targetUserId) {
-          const similarity = cosineSimilarity(targetUser, data[userId]);
-
-          if (similarity > 0) {
-            similarUsers.push(userId);
-          }
-        }
-      }
-
-      return similarUsers;
-    }
-
-    function recommendProductsWithScore(
-      targetUserId: string,
-      data: { [userId: string]: { [productId: string]: number } },
-    ): { productId: string; score: number }[] {
-      const targetUser = data[targetUserId];
-      const similarUsers = findSimilarUsers(targetUserId, data);
-
-      const weightedScores: { productId: string; score: number }[] = [];
-
-      for (const userId of similarUsers) {
-        const similarUser = data[userId];
-        for (const productId in similarUser) {
-          if (
-            !targetUser.hasOwnProperty(productId) ||
-            targetUser[productId] === 0
-          ) {
-            // Calculate weighted score based on similarity and user's rating
-            const similarity = cosineSimilarity(targetUser, similarUser);
-            const weightedScore = similarity * similarUser[productId];
-
-            // Accumulate weighted scores in the array
-            weightedScores.push({ productId, score: weightedScore });
-          }
-        }
-      }
-
-      return weightedScores;
-    }
-
     const targetUserId = UserId;
-    const recommendations = recommendProductsWithScore(
+    const recommendations = this.hybridRecommendation(
       targetUserId,
       OtherUserProductMap,
     );
 
-    return recommendations
-      .sort((a, b) => b.score - a.score)
-      .filter((item) => item.score > 0);
+    return recommendations;
+  }
+
+  async recommendProductsWithScore(
+    targetUserId: string,
+    data: { [userId: string]: { [productId: string]: number } },
+  ) {
+    const targetUser = data[targetUserId];
+    const similarUsers = findSimilarUsers(targetUserId, data);
+
+    const weightedScores: { productId: string; score: number }[] = [];
+
+    for (const userId of similarUsers) {
+      const similarUser = data[userId];
+      for (const productId in similarUser) {
+        if (
+          !targetUser.hasOwnProperty(productId) ||
+          targetUser[productId] === 0
+        ) {
+          // Calculate weighted score based on similarity and user's rating
+          const similarity = cosineSimilarity(targetUser, similarUser);
+          const weightedScore = similarity * similarUser[productId];
+
+          // Accumulate weighted scores in the array
+          weightedScores.push({ productId, score: weightedScore });
+        }
+      }
+    }
+
+    return weightedScores;
+  }
+
+  async recommendPopularProducts(): Promise<
+    { productId: string; score: number }[]
+  > {
+    const AllProductList = await this.PrismaService.productsShelves
+      .findMany({
+        include: { Dish: true },
+      })
+      .then((res) => {
+        return res
+          .map((item) => ({
+            productId: item.id,
+            score: item.Dish.length,
+          }))
+          .sort((a, b) => b.score - a.score);
+      });
+    return AllProductList.slice(0, 9);
+  }
+  async hybridRecommendation(
+    userId: string,
+    data: {
+      [userId in string]: {
+        [ProductId in string]: number;
+      };
+    },
+  ) {
+    // 根据用户交互次数或历史数据量判断当前阶段
+    const interactionThreshold = 10; // 举例，可以根据实际情况调整
+
+    const userInteractionCount = Object.keys(data[userId]).length;
+
+    if (userInteractionCount < interactionThreshold) {
+      // 当用户交互不足时，采用热门物品推荐
+      return this.recommendPopularProducts();
+    } else {
+      // 当用户交互足够时，采用基于用户的协同过滤算法
+      return this.recommendProductsWithScore(userId, data).then(
+        (res) =>
+          res
+            .sort((a, b) => b.score - a.score)
+            .filter((item) => item.score > 0), // 根据推荐分数排序
+      );
+    }
   }
 }
