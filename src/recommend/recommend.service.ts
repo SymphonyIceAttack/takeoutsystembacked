@@ -10,7 +10,7 @@ export class RecommendService {
   async userRecommend(UserId: string) {
     //查询该用户的order列表
     const UserOrders = await this.PrismaService.order.findMany({
-      where: { user_id: UserId, status: OrderStatus.Finish },
+      where: { user_id: UserId },
       include: {
         dishes: true,
       },
@@ -67,7 +67,7 @@ export class RecommendService {
     const otherUserProductList = await Promise.all(
       UserIds.map((userId) =>
         this.PrismaService.order.findMany({
-          where: { user_id: userId, status: OrderStatus.Finish },
+          where: { user_id: userId },
           include: {
             dishes: true,
           },
@@ -115,12 +115,24 @@ export class RecommendService {
     });
 
     const targetUserId = UserId;
-    const recommendations = this.hybridRecommendation(
+    const recommendations = await this.hybridRecommendation(
       targetUserId,
       OtherUserProductMap,
     );
 
-    return recommendations;
+    return Promise.all(
+      recommendations.map(async (recommendItem) => {
+        const ProductItem = await this.PrismaService.productsShelves.findUnique(
+          {
+            where: { id: recommendItem.productId },
+          },
+        );
+        return {
+          ...ProductItem,
+          score: recommendItem.score.toFixed(2),
+        };
+      }),
+    );
   }
 
   async recommendProductsWithScore(
@@ -179,6 +191,15 @@ export class RecommendService {
   ) {
     // 根据用户交互次数或历史数据量判断当前阶段
     const interactionThreshold = 10; // 举例，可以根据实际情况调整
+    const OrderList = await this.PrismaService.order.findMany({
+      where: {
+        user_id: userId,
+      },
+    });
+
+    if (OrderList.length === 0) {
+      return this.recommendPopularProducts();
+    }
 
     const userInteractionCount = Object.keys(data[userId]).length;
 
