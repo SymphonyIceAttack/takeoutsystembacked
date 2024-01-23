@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { OrderStatus } from './Status.type';
 import { Dish, ProductsShelves } from '@prisma/client';
+import { getFormattedDate } from 'src/import-data/dateUtils';
 @Injectable()
 export class OrderService {
   constructor(private readonly PrismaService: PrismaService) {}
@@ -36,6 +37,7 @@ export class OrderService {
             data: {
               productId: DishObj.product_id,
               order_id: newOrder.id,
+              create_time: getFormattedDate(),
             },
             include: {
               product: true,

@@ -14,4 +14,14 @@ export class ImportDataController {
   async ImportProdList() {
     return this.importDataService.ImportProdList();
   }
+
+  @Get('generateUserList')
+  async generateUserList() {
+    return this.importDataService.generateUserList();
+  }
+
+  @Get('generateDishList')
+  async generateDishList() {
+    return this.importDataService.generateDishList();
+  }
 }

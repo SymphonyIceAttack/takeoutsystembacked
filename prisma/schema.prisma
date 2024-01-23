@@ -56,8 +56,9 @@ model ShopSettle {
 }
 
 model Dish {
-  id       String @id @default(uuid())
-  order_id String
+  id          String @id @default(uuid())
+  order_id    String
+  create_time String
 
   productId String
   order     Order           @relation(fields: [order_id], references: [id])

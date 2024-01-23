@@ -93,7 +93,7 @@ export class ShopService {
           mer_id: merId,
           allowShopControl: isReview,
         },
-        include: {},
+        include: { Dish: true },
         skip: skip, // 跳过的记录数量
         take: take, // 返回的记录数量
       }),
