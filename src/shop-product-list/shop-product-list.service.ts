@@ -28,19 +28,35 @@ export class ShopProductListService {
       },
     });
 
+    const list = await this.PrismaService.productsShelves.findMany({
+      where: {
+        area_id: AreaId,
+        mer_id: mer_id,
+        allowShopControl: allowControl,
+        isShelvesShow: isShelvesShow,
+      },
+      include: {
+        Dish: true,
+        UserInteraction: {
+          select: {
+            id: true,
+            isLike: true,
+          },
+        },
+      },
+      skip: skip, // 跳过的记录数量
+      take: take, // 返回的记录数量
+    });
+
     return {
       total: totalCount,
-      list: await this.PrismaService.productsShelves.findMany({
-        where: {
-          area_id: AreaId,
-          mer_id: mer_id,
-          allowShopControl: allowControl,
-          isShelvesShow: isShelvesShow,
-        },
-        include: { Dish: true },
-        skip: skip, // 跳过的记录数量
-        take: take, // 返回的记录数量
-      }),
+      list: list.map((item) => ({
+        ...item,
+        countLike: item.UserInteraction.reduce((prevalue, userInter) => {
+          const count = userInter.isLike ? 1 : -1;
+          return prevalue + count;
+        }, 0),
+      })),
     };
   }
 }

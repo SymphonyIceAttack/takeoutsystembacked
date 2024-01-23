@@ -11,16 +11,17 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(uuid())
-  account  String  @unique
-  password String
-  identity String
-  Order    Order[]
-  Shop     Shop?
+  id              String            @id @default(uuid())
+  account         String            @unique
+  password        String
+  identity        String
+  Order           Order[]
+  UserInteraction UserInteraction[]
+  Shop            Shop?
 }
 
 model ProductsShelves {
-  id               String  @id @unique @default(uuid())
+  id               String            @id @unique @default(uuid())
   goods_title      String
   area_id          String
   mer_id           String
@@ -30,8 +31,9 @@ model ProductsShelves {
   sold_total_all   Int
   allowShopControl Boolean
   isShelvesShow    Boolean
-  shop             Shop    @relation(fields: [mer_id], references: [id])
+  shop             Shop              @relation(fields: [mer_id], references: [id])
   Dish             Dish[]
+  UserInteraction  UserInteraction[]
 }
 
 model Shop {
@@ -80,4 +82,15 @@ model Order {
 
   shop Shop @relation(fields: [mer_id], references: [id])
   user User @relation(fields: [user_id], references: [id])
+}
+
+model UserInteraction {
+  id        String  @unique @id @default(uuid())
+  userId    String
+  productId String
+  isLike    Boolean
+  comment   String
+
+  productsShelve ProductsShelves @relation(fields: [productId], references: [id])
+  User           User            @relation(fields: [userId], references: [id])
 }

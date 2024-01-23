@@ -1,6 +1,4 @@
 import { Injectable, Post } from '@nestjs/common';
-import { getRandomObjects } from 'src/import-data/dateUtils';
-import { OrderStatus } from 'src/order/Status.type';
 import { PrismaService } from 'src/prisma.service';
 import { cosineSimilarity, findSimilarUsers } from './SimilarityFunction';
 
