@@ -144,6 +144,7 @@ export class ImportDataService {
               mer_id: getRandomObjects(Mers, 1)[0].id,
               status: OrderStatus.Finish,
               number: 0,
+              create_time: DateString,
               totalPrice: 0,
             },
           }),
@@ -151,7 +152,7 @@ export class ImportDataService {
       );
       for (const order of orders) {
         const resDish = await Promise.all(
-          Array.from({ length: Math.floor(Math.random() * 3) }).map(() =>
+          Array.from({ length: Math.floor(Math.random() * 2) + 1 }).map(() =>
             this.PrismaService.dish.create({
               data: {
                 order_id: order.id,

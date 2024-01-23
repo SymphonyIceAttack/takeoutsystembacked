@@ -70,7 +70,7 @@ model Order {
   mer_id  String
   user_id String
 
-  create_time DateTime @default(now())
+  create_time String
 
   dishes Dish[]
 

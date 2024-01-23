@@ -1,4 +1,5 @@
 import { Injectable, Post } from '@nestjs/common';
+import { getRandomObjects } from 'src/import-data/dateUtils';
 import { OrderStatus } from 'src/order/Status.type';
 import { PrismaService } from 'src/prisma.service';
 import { cosineSimilarity, findSimilarUsers } from './SimilarityFunction';
@@ -14,6 +15,10 @@ export class RecommendService {
       include: {
         dishes: true,
       },
+      orderBy: {
+        create_time: 'desc',
+      },
+      take: 10,
     });
 
     const SetUserProductArray = new Set<string>();
@@ -23,7 +28,11 @@ export class RecommendService {
       });
     });
     //根据这个商品id数组去查询相关用户列表
-    const UserProductIds: string[] = Array.from(SetUserProductArray);
+    const UserProductIds: string[] = Array.from(SetUserProductArray).slice(
+      0,
+      10,
+    );
+
     //先查询这些商品包含的Dish
     const ProductList = await Promise.all(
       UserProductIds.map((productid) =>
@@ -58,6 +67,7 @@ export class RecommendService {
       SetUserArray.add(order.user_id);
     });
     const UserIds = Array.from(SetUserArray);
+
     // .filter(
     //   (userId) => userId !== UserId,
     // );
@@ -98,21 +108,21 @@ export class RecommendService {
     });
 
     // 获取所有产品的集合
-    const allProducts: Set<string> = new Set();
-    Object.values(OtherUserProductMap).forEach((user) => {
-      Object.keys(user).forEach((productId) => {
-        allProducts.add(productId);
-      });
-    });
+    // const allProducts: Set<string> = new Set();
+    // Object.values(OtherUserProductMap).forEach((user) => {
+    //   Object.keys(user).forEach((productId) => {
+    //     allProducts.add(productId);
+    //   });
+    // });
 
-    // 补齐缺失的产品为 0
-    Object.keys(OtherUserProductMap).forEach((userId) => {
-      allProducts.forEach((productId) => {
-        if (!(productId in OtherUserProductMap[userId])) {
-          OtherUserProductMap[userId][productId] = 0;
-        }
-      });
-    });
+    // // 补齐缺失的产品为 0
+    // Object.keys(OtherUserProductMap).forEach((userId) => {
+    //   allProducts.forEach((productId) => {
+    //     if (!(productId in OtherUserProductMap[userId])) {
+    //       OtherUserProductMap[userId][productId] = 0;
+    //     }
+    //   });
+    // });
 
     const targetUserId = UserId;
     const recommendations = await this.hybridRecommendation(
@@ -212,7 +222,8 @@ export class RecommendService {
         (res) =>
           res
             .sort((a, b) => b.score - a.score)
-            .filter((item) => item.score > 0), // 根据推荐分数排序
+            .filter((item) => item.score > 0)
+            .slice(0, 9), // 根据推荐分数排序
       );
     }
   }

@@ -19,6 +19,7 @@ export class OrderService {
       number: number;
     }[];
   }) {
+    const todayFormatted = getFormattedDate();
     const newOrder = await this.PrismaService.order.create({
       data: {
         mer_id: mer_id,
@@ -26,6 +27,7 @@ export class OrderService {
         number: 0,
         totalPrice: 0,
         status: OrderStatus.pending,
+        create_time: todayFormatted,
       },
     });
     const DishPromiseArray: Promise<Dish & { product: ProductsShelves }>[] = [];
