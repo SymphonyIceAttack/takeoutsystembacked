@@ -10,6 +10,7 @@ import { OrderModule } from './order/order.module';
 import { ShopModule } from './shop/shop.module';
 import { AdminModule } from './admin/admin.module';
 import { RecommendModule } from './recommend/recommend.module';
+import { ShopSettleModule } from './shop-settle/shop-settle.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { RecommendModule } from './recommend/recommend.module';
     ShopModule,
     AdminModule,
     RecommendModule,
+    ShopSettleModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

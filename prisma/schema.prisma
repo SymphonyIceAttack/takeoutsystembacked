@@ -35,7 +35,7 @@ model ProductsShelves {
 }
 
 model Shop {
-  id          String            @id @unique
+  id          String            @id @unique @default(uuid())
   userId      String            @unique
   store_title String
   area_id     String
@@ -43,6 +43,16 @@ model Shop {
   ProdList    ProductsShelves[]
   Order       Order[]
   user        User              @relation(fields: [userId], references: [id])
+}
+
+model ShopSettle {
+  id          String @id @unique @default(uuid())
+  account     String @unique
+  password    String
+  store_title String
+  area_id     String
+  area_title  String
+  status      String
 }
 
 model Dish {
