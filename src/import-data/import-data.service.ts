@@ -135,21 +135,20 @@ export class ImportDataService {
 
     const Products = await this.PrismaService.productsShelves.findMany();
 
-    const orders = await Promise.all(
-      getRandomObjects(users, Math.round(users.length / 2)).map((user) =>
-        this.PrismaService.order.create({
-          data: {
-            user_id: user.id,
-            mer_id: getRandomObjects(Mers, 1)[0].id,
-            status: OrderStatus.Finish,
-            number: 0,
-            totalPrice: 0,
-          },
-        }),
-      ),
-    );
-
     for (const DateString of dateArray) {
+      const orders = await Promise.all(
+        getRandomObjects(users, Math.round(users.length / 2)).map((user) =>
+          this.PrismaService.order.create({
+            data: {
+              user_id: user.id,
+              mer_id: getRandomObjects(Mers, 1)[0].id,
+              status: OrderStatus.Finish,
+              number: 0,
+              totalPrice: 0,
+            },
+          }),
+        ),
+      );
       for (const order of orders) {
         const resDish = await Promise.all(
           Array.from({ length: Math.floor(Math.random() * 3) }).map(() =>
@@ -168,6 +167,7 @@ export class ImportDataService {
             }),
           ),
         );
+
         const TotalNumber = resDish.length;
 
         await this.PrismaService.order.update({
