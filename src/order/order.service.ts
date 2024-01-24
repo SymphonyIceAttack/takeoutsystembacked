@@ -49,6 +49,17 @@ export class OrderService {
       });
     });
 
+    for (const DishObj of Dishes) {
+      await this.PrismaService.productsShelves.update({
+        where: { id: DishObj.product_id },
+        data: {
+          sold_total_all: {
+            increment: DishObj.number,
+          },
+        },
+      });
+    }
+
     const resDish = await Promise.all(DishPromiseArray);
 
     const TotalNumber = resDish.length;

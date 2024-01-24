@@ -3,7 +3,6 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { PayLoadType } from 'src/auth/payload.type';
 import { UserInteractionService } from './user-interaction.service';
 @UseGuards(AuthGuard)
-@Controller('shop')
 @Controller('user-interaction')
 export class UserInteractionController {
   constructor(

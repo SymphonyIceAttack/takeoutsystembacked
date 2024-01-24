@@ -12,6 +12,7 @@ import { AdminModule } from './admin/admin.module';
 import { RecommendModule } from './recommend/recommend.module';
 import { ShopSettleModule } from './shop-settle/shop-settle.module';
 import { UserInteractionModule } from './user-interaction/user-interaction.module';
+import { DataAnalysisModule } from './data-analysis/data-analysis.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { UserInteractionModule } from './user-interaction/user-interaction.modul
     RecommendModule,
     ShopSettleModule,
     UserInteractionModule,
+    DataAnalysisModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

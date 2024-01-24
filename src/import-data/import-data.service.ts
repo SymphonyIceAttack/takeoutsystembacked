@@ -119,15 +119,15 @@ export class ImportDataService {
   async generateDishList() {
     const todayFormatted = getFormattedDate();
     const dateArray: string[] = [];
-    Array.from({ length: 90 }).forEach((item, index) => {
+    Array.from({ length: 60 }).forEach((item, index) => {
       dateArray.push(
-        transformPreviousAndNextDay(todayFormatted, index).previousDay,
+        transformPreviousAndNextDay('20231201', index).previousDay,
       );
     });
 
     const users = await this.PrismaService.user.findMany();
 
-    const Mers = await (
+    const Mers = (
       await this.PrismaService.shop.findMany({
         include: { ProdList: true },
       })
@@ -152,7 +152,7 @@ export class ImportDataService {
       );
       for (const order of orders) {
         const resDish = await Promise.all(
-          Array.from({ length: Math.floor(Math.random() * 2) + 1 }).map(() =>
+          Array.from({ length: Math.floor(Math.random() * 4) + 1 }).map(() =>
             this.PrismaService.dish.create({
               data: {
                 order_id: order.id,
@@ -168,6 +168,17 @@ export class ImportDataService {
             }),
           ),
         );
+
+        for (const Dish of resDish) {
+          await this.PrismaService.productsShelves.update({
+            where: { id: Dish.productId },
+            data: {
+              sold_total_all: {
+                increment: 1,
+              },
+            },
+          });
+        }
 
         const TotalNumber = resDish.length;
 
